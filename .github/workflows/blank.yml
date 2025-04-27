@@ -1,0 +1,23 @@
+name: Deploy DAGs to Cloud Composer
+
+on:
+  push:
+    branches: [main]  # or your branch name
+    paths:
+      - 'dags/**'     # triggers only when DAG files change
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+
+    - name: Setup Google Cloud SDK
+      uses: google-github-actions/auth@v2
+      with:
+        credentials_json: ${{ secrets.GCP_SA_KEY }}
+
+    - name: Upload DAGs to Composer Bucket
+      run: |
+        gsutil -m rsync -d -r dags gs://us-central1-nyc-taxi-pipeli-9f77434c-bucket/dags
